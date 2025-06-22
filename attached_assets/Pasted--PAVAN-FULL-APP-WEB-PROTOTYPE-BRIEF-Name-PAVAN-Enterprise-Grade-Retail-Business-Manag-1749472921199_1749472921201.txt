@@ -1,0 +1,316 @@
+
+📋 PAVAN – FULL APP & WEB PROTOTYPE BRIEF
+
+> Name: PAVAN – Enterprise-Grade Retail & Business Management
+Goal: Build a beautiful, powerful, intuitive platform—web + mobile—that beats IKEA, Walmart POS, and Amazon Seller Panel.
+
+
+
+
+---
+
+🎨 Visual Design Foundations
+
+Fonts: Inter (Headings), Poppins (Body)
+
+Primary Color: Royal Blue #0057ff
+
+Accent Color: Emerald Green #00c896
+
+Neutrals: Light Gray #f5f7fa, Dark Gray #333333
+
+Buttons & Cards: Rounded corners (12px), subtle shadows
+
+Icons: Line-icon set (Lucide), custom SVGs for barcode & mic
+
+Animations: Soft hover states, micro-interactions, skeleton loaders
+
+
+
+---
+
+🔑 1. Authentication Flow
+
+1. Welcome / Splash Screen
+
+Animated logo reveal
+
+“Enter PAVAN” button
+
+
+
+2. Login Page
+
+Email & Password fields
+
+👁️ Show/Hide Password toggle icon
+
+“Remember me” checkbox
+
+“Forgot Password?” link → Reset OTP screen
+
+Social Login: Google, LinkedIn buttons
+
+
+
+3. Password Reset
+
+Enter email → “Send OTP”
+
+OTP verification screen (4-digit inputs)
+
+New password + confirm + 👁️ toggle
+
+
+
+4. Sign Up Page
+
+Name, Email, Phone, Password + 👁️ toggle
+
+Role selector dropdown (Customer / Sales Rep)
+
+“I agree to Terms & Privacy”
+
+
+
+
+
+---
+
+🏠 2. Role Selection (After Login)
+
+Landing Screen if multi-role user: Buttons for each role
+
+Auto-redirect if single role
+
+
+
+---
+
+🎛 3. Role-Based Dashboards
+
+Each dashboard has:
+
+Top Nav: Brand logo, currency selector dropdown (₹, $, €, ★), notifications bell, user avatar
+
+Sidebar: Collapsible, icons + labels
+
+Main Area: Widgets & quick-links
+
+
+A. Admin Dashboard
+
+Widgets:
+
+Total Sales (chart)
+
+Active Leads
+
+Stock Alerts
+
+Monthly Revenue
+
+
+Quick-links: Manage Users, View Reports, System Settings
+
+
+B. Sales Dashboard
+
+Widgets:
+
+Leads in Pipeline (funnel graph)
+
+Sales Today
+
+Tasks & Reminders
+
+
+Quick-links: Add Lead, New Order, Follow-up Board
+
+
+C. Inventory Manager
+
+Widgets:
+
+Items Low on Stock
+
+Stock Value by Category
+
+
+Quick-links: Add Item, View Categories, Supplier Requests
+
+
+D. Cashier / POS
+
+Large Search Bar (with mic icon for voice search)
+
+Barcode Scanner button (opens camera/camera API)
+
+Product Grid: thumbnail cards, name, price, stock
+
+Cart Panel: list with thumbnails, qty stepper, subtotal
+
+Checkout Button: open Invoice Modal
+
+
+
+---
+
+📇 4. CRM Module (Sales & Admin)
+
+Add Lead Form: Name, Company, Contact, Source dropdown, Notes
+
+Assign Lead: multi-select reps, due date
+
+Lead Board (Kanban): columns (New / Contacted / Follow-Up / Converted / Dropped) drag-n-drop
+
+Follow-up List: calendar view + upcoming reminders
+
+Lead Details: interaction log, files, emails
+
+Convert Lead: form to turn into Customer & initial Order
+
+
+
+---
+
+📦 5. Inventory Module (Inventory & Admin)
+
+Add / Update Stock:
+
+Fields: Name, SKU, Category dropdown, Supplier dropdown, Cost, Sell Price, Quantity, Image Upload (drag-drop, crop)
+
+Barcode auto-generate & manual entry
+
+
+Inventory List:
+
+Table with columns: Thumbnail, Name, SKU, Category, Qty, Threshold, Actions (Edit/Delete)
+
+Filters: Category, Supplier, Stock Status
+
+
+Threshold Alerts:
+
+Email / Push settings + alert widget
+
+
+Supplier Management:
+
+Add / Edit suppliers, contact info, lead times
+
+
+
+
+---
+
+🛒 6. Sales & POS Module
+
+Product Lookup:
+
+Voice search (Web Speech API) + type search + barcode
+
+
+POS Screen (Cart Flow):
+
+Left: Product grid with thumbnails & quick “+” button
+
+Right: Cart summary panel with thumbnail, qty stepper, item total
+
+Discounts & coupon input
+
+Payment method selector: Cash / Card / UPI
+
+Finalize sale → Invoice Modal
+
+
+Invoice Modal:
+
+Header: PAVAN logo, Invoice #, Date, Customer info
+
+Table: Thumbnail, Name, Qty, Price, Total
+
+Footer: Subtotal, Tax, Grand Total
+
+Buttons: “Print” (opens print dialog), “Download PDF”
+
+
+
+
+---
+
+📊 7. Dashboard Widgets & Reports
+
+Sales Summary: line/bar charts (day/week/month) (Chart.js)
+
+Top Products: thumbnail list with sales count
+
+Lead Funnel: funnel chart
+
+Inventory Value: pie chart by category
+
+Export Reports: buttons to download CSV / Excel / PDF
+
+
+
+---
+
+⚙️ 8. Settings
+
+User & Role Management:
+
+List users, roles, permission toggles
+
+
+Profile Settings:
+
+Update name, email, password (+ 👁️ toggle), avatar upload
+
+
+Notification Preferences: Email / SMS / Push toggles
+
+Branding: Upload logo, set primary/secondary colors
+
+Multi-Location: Add stores/warehouses, assign managers
+
+
+
+---
+
+🌍 9. Mobile App Adaptation
+
+Bottom Tab Bar: Home, CRM, Inventory, POS, Profile
+
+Single-column layouts, collapsible sections
+
+Touch-optimized buttons & steppers
+
+Camera-based barcode scan
+
+Voice search tapped via mic icon
+
+
+
+---
+
+🔧 10. Tech & Deployment
+
+Frontend: React + TailwindCSS, React Router, Context API
+
+Backend: Node.js + Express, RESTful routes
+
+Auth: Firebase Auth (Email/Password + Social)
+
+Database: Firebase Firestore or MongoDB Atlas
+
+Storage: Firebase Storage or Cloudinary for images
+
+PDF Generation: pdfkit or html-pdf on server
+
+Host Frontend: Vercel / Netlify
+
+Host Backend: Render / Railway / Heroku
+
+CI/CD: GitHub Actions auto-deploy on push
+
+
