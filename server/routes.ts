@@ -1,6 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { generateToken } from "./auth/jwt";
+import { authenticateToken, authorizeRoles } from "./auth/middleware";
 import { storage } from "./storage";
+import { UserRole } from "./auth/role";
 import { insertUserSchema, insertLeadSchema, insertCategorySchema, insertSupplierSchema, insertProductSchema, insertOrderSchema, insertOrderItemSchema, insertLeadInteractionSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -20,7 +23,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // In a real app, you'd generate a JWT token here
       const { password: _, ...userWithoutPassword } = user;
-      res.json({ user: userWithoutPassword });
+       const token = generateToken(user);
+  
+      res.json({ user: userWithoutPassword ,token:token});
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
@@ -45,7 +50,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User routes
-  app.get("/api/users", async (req, res) => {
+  app.get("/api/users", authenticateToken,
+  authorizeRoles(UserRole.ADMIN),async (req, res) => {
     try {
       const users = await storage.getAllUsers();
       const usersWithoutPasswords = users.map(({ password, ...user }) => user);
@@ -55,7 +61,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/users/:id", async (req, res) => {
+  app.get("/api/users/:id", authenticateToken,
+  authorizeRoles(UserRole.ADMIN),async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const user = await storage.getUser(id);
@@ -89,7 +96,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Lead routes
-  app.get("/api/leads", async (req, res) => {
+  app.get("/api/leads", authenticateToken,
+  authorizeRoles(UserRole.ADMIN,UserRole.SALES) ,async (req, res) => {
 
   
     try {
@@ -110,7 +118,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/leads/:id", async (req, res) => {
+  app.get("/api/leads/:id",authenticateToken,
+  authorizeRoles(UserRole.ADMIN,UserRole.SALES) , async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const lead = await storage.getLead(id);
@@ -125,7 +134,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/leads", async (req, res) => {
+  app.post("/api/leads",authenticateToken,
+  authorizeRoles(UserRole.ADMIN,UserRole.SALES) , async (req, res) => {
     try {
       const leadData = insertLeadSchema.parse(req.body);
       const lead = await storage.createLead(leadData);
@@ -135,7 +145,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/leads/:id", async (req, res) => {
+  app.put("/api/leads/:id",authenticateToken,
+  authorizeRoles(UserRole.ADMIN,UserRole.SALES) , async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const leadData = insertLeadSchema.partial().parse(req.body);
@@ -151,7 +162,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/leads/:id", async (req, res) => {
+  app.delete("/api/leads/:id",authenticateToken,
+  authorizeRoles(UserRole.ADMIN) , async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteLead(id);
@@ -167,7 +179,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Lead interactions
-  app.get("/api/leads/:id/interactions", async (req, res) => {
+  app.get("/api/leads/:id/interactions", authenticateToken,
+  authorizeRoles(UserRole.ADMIN,UserRole.SALES) ,async (req, res) => {
     try {
       const leadId = parseInt(req.params.id);
       const interactions = await storage.getLeadInteractions(leadId);
@@ -177,7 +190,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/leads/:id/interactions", async (req, res) => {
+  app.post("/api/leads/:id/interactions",authenticateToken,
+  authorizeRoles(UserRole.ADMIN,UserRole.SALES) , async (req, res) => {
     try {
       const leadId = parseInt(req.params.id);
       const interactionData = insertLeadInteractionSchema.parse({
@@ -193,7 +207,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Category routes
-  app.get("/api/categories", async (req, res) => {
+  app.get("/api/categories",authenticateToken,
+  authorizeRoles(UserRole.ADMIN) , async (req, res) => {
     try {
       const categories = await storage.getAllCategories();
       res.json(categories);
@@ -202,7 +217,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/categories", async (req, res) => {
+  app.post("/api/categories",authenticateToken,
+  authorizeRoles(UserRole.ADMIN) , async (req, res) => {
     try {
       const categoryData = insertCategorySchema.parse(req.body);
       const category = await storage.createCategory(categoryData);
@@ -212,7 +228,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/categories/:id", async (req, res) => {
+  app.put("/api/categories/:id",authenticateToken,
+  authorizeRoles(UserRole.ADMIN) ,  async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const categoryData = insertCategorySchema.partial().parse(req.body);
@@ -228,7 +245,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/categories/:id", async (req, res) => {
+  app.delete("/api/categories/:id", authenticateToken,
+  authorizeRoles(UserRole.ADMIN) , async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteCategory(id);
@@ -244,7 +262,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Supplier routes
-  app.get("/api/suppliers", async (req, res) => {
+  app.get("/api/suppliers",authenticateToken,
+  authorizeRoles(UserRole.ADMIN) ,  async (req, res) => {
     try {
       const suppliers = await storage.getAllSuppliers();
       res.json(suppliers);
@@ -253,7 +272,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/suppliers", async (req, res) => {
+  app.post("/api/suppliers", authenticateToken,
+  authorizeRoles(UserRole.ADMIN) , async (req, res) => {
     try {
       const supplierData = insertSupplierSchema.parse(req.body);
       const supplier = await storage.createSupplier(supplierData);
@@ -263,7 +283,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/suppliers/:id", async (req, res) => {
+  app.put("/api/suppliers/:id",authenticateToken,
+  authorizeRoles(UserRole.ADMIN) ,  async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const supplierData = insertSupplierSchema.partial().parse(req.body);
@@ -279,7 +300,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/suppliers/:id", async (req, res) => {
+  app.delete("/api/suppliers/:id", authenticateToken,
+  authorizeRoles(UserRole.ADMIN) , async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteSupplier(id);
@@ -295,7 +317,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Product routes
-  app.get("/api/products", async (req, res) => {
+  app.get("/api/products", authenticateToken,
+  authorizeRoles(UserRole.ADMIN) , async (req, res) => {
     try {
       const { category, lowStock } = req.query;
       
@@ -314,7 +337,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/products/:id", async (req, res) => {
+  app.get("/api/products/:id",authenticateToken,
+  authorizeRoles(UserRole.ADMIN) ,  async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const product = await storage.getProduct(id);
@@ -329,7 +353,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/products/sku/:sku", async (req, res) => {
+  app.get("/api/products/sku/:sku",authenticateToken,
+  authorizeRoles(UserRole.ADMIN) ,  async (req, res) => {
     try {
       const product = await storage.getProductsBySku(req.params.sku);
       
@@ -343,7 +368,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/products", async (req, res) => {
+  app.post("/api/products",authenticateToken,
+  authorizeRoles(UserRole.ADMIN) ,  async (req, res) => {
     try {
       const productData = insertProductSchema.parse(req.body);
       const product = await storage.createProduct(productData);
@@ -353,7 +379,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/products/:id", async (req, res) => {
+  app.put("/api/products/:id", authenticateToken,
+  authorizeRoles(UserRole.ADMIN) , async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const productData = insertProductSchema.partial().parse(req.body);
@@ -369,7 +396,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/products/:id", async (req, res) => {
+  app.delete("/api/products/:id",authenticateToken,
+  authorizeRoles(UserRole.ADMIN) ,  async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const deleted = await storage.deleteProduct(id);
@@ -385,7 +413,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Order routes
-  app.get("/api/orders", async (req, res) => {
+  app.get("/api/orders", authenticateToken,
+  authorizeRoles(UserRole.ADMIN) , async (req, res) => {
     try {
       const { customerId, startDate, endDate } = req.query;
       
@@ -404,7 +433,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/orders/:id", async (req, res) => {
+  app.get("/api/orders/:id", authenticateToken,
+  authorizeRoles(UserRole.ADMIN) , async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const order = await storage.getOrder(id);
@@ -419,7 +449,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/orders/:id/items", async (req, res) => {
+  app.get("/api/orders/:id/items", authenticateToken,
+  authorizeRoles(UserRole.ADMIN) , async (req, res) => {
     try {
       const orderId = parseInt(req.params.id);
       const items = await storage.getOrderItems(orderId);
@@ -429,7 +460,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/orders", async (req, res) => {
+  app.post("/api/orders",authenticateToken,
+  authorizeRoles(UserRole.ADMIN) ,  async (req, res) => {
     try {
       const { order, items } = req.body;
       
@@ -463,7 +495,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Dashboard analytics
-  app.get("/api/dashboard/stats", async (req, res) => {
+  app.get("/api/dashboard/stats",authenticateToken,
+  authorizeRoles(UserRole.ADMIN) ,  async (req, res) => {
     try {
       const stats = await storage.getDashboardStats();
       res.json(stats);

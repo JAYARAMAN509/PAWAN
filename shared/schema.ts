@@ -1,6 +1,8 @@
 import { pgTable, text, serial, integer, boolean, timestamp, decimal, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { UserRole } from "../server/auth/role"; // adjust path as needed
+
 
 // Users table with role-based access
 export const users = pgTable("users", {
@@ -9,7 +11,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   name: text("name").notNull(),
   phone: text("phone"),
-  role: text("role").notNull(), // Admin, Sales, Inventory, Cashier
+  role: text("role").notNull().default(UserRole.SALES), // default role from enum
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
